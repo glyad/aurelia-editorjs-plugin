@@ -1,5 +1,7 @@
-import { autoinject, BehaviorInstruction, noView, processContent, ViewCompiler, ViewResources, viewResources } from 'aurelia-framework';
-import EditorJS from "@editorjs/editorjs";
+import { 
+  autoinject, BehaviorInstruction, bindable, noView, processContent, ViewCompiler,
+  ViewResources, viewResources } from 'aurelia-framework';
+import EditorJS, { EditorConfig } from "@editorjs/editorjs";
 import Table from '@editorjs/table';
 import { XMLParser } from 'fast-xml-parser';
 
@@ -36,7 +38,7 @@ function ProcessContentCallback(
     if (configNodes.length > 0) {
       const configNode = node.getElementsByTagName('au-editorjs.config')[0];
       
-      alert(xmlToJson(configNode.outerHTML));
+      //alert(xmlToJson(configNode.outerHTML));
 
       node.removeChild(configNode);
     }
@@ -49,48 +51,23 @@ function ProcessContentCallback(
 export class AuEditorjs {
   constructor(private _element: Element) { }
 
-  attached() {
+  private _editor: EditorJS;
+  
+  @bindable config: EditorConfig|string;
+
+  protected bind(): void {
+    if (this.config === undefined) {
+      this.config = {};
+    }
+  }
+
+  protected attached(): void {
     const holder = <HTMLElement>this._element; 
-    const editor: EditorJS = new EditorJS({
+    const config = typeof this.config === 'string' ? JSON.parse(this.config) : this.config;
+    this._editor = new EditorJS({
       holder: holder,
-      tools: {
-        table: {
-          class: Table,
-          config: {
-            rows: 2,
-            cols: 3,
-            maxRows: 5,
-            maxCols: 5,
-          },
-        }
-      },
-      data: template
-    });
+      ...config
+    });      
   }
 }
 
-const template = {
-  time: 1730041557240,
-  blocks: [
-    {
-      id: "d22rJhoCyz",
-      type: "table",
-      data: {
-        withHeadings: true,
-        stretched: false,
-        content: [
-          ["", "High-voltage supply adjusted", "Min", "Max", "Ok"],
-          ["Voltage", "{measurement}", "340", "360", ""],
-        ],
-      },
-    },
-  ],
-  version: "2.30.6",
-};
-
-const config = {
-  rows: 2,
-  cols: 5,
-  withHeadings: true,
-  readOnly: false
-};
