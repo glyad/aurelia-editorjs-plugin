@@ -3,7 +3,6 @@ import {PLATFORM} from 'aurelia-pal';
 
 export function configure(config: FrameworkConfiguration): void {
   config.globalResources([
-    PLATFORM.moduleName('./elements/hello-world'),
     PLATFORM.moduleName('./au-editorjs')
   ]);
 }
